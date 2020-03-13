@@ -231,27 +231,42 @@ class Crawler():
         driver.implicitly_wait(30)
 
         # get curriculum schedule
-        tmp = driver.find_element_by_id('w_DailyCourse').text
+        string = driver.find_element_by_id('w_DailyCourse').text
         driver.implicitly_wait(30)
         driver.quit()
         
         # get target information
-        tmp = tmp.split('\n')
+        string = string.split('\n')
         # pop date list
-        tmp.pop(1)
+        string.pop(1)
 
-        """ previous = tmp[2]   # start from the first class
-        for idx, string in enumerate(tmp[3:], 3):
-            if string[12:] == previous[12:]:
-                # union the time
-                print(f'{string}\t {previous}')
-                tmp[idx] = string.replace(string[0:4], previous[0:4])
-                tmp.pop(idx-1)
-            
-            previous = string """
-        
+        previous = string[2]   # start from the first class
+        continue_flag = False
+        idx = 3
+        for cur in string[3:]:
+            if cur[12:] == previous[12:]:
+                # check whether repeated continuously
+                if not continue_flag:
+                    start_time = previous[:5]
+                    continue_flag = True
+                
+                # pop repeated course
+                string.pop(idx-1)
+
+            else:
+                if continue_flag:
+                    string[idx-1] = previous.replace(previous[:5], start_time)
+                    continue_flag = False
+                
+                idx += 1
+
+            previous = cur
+        # check the last course    
+        if continue_flag:
+            string[-1] = cur.replace(cur[:5], start_time)
+
         # get daily curriculum schedule
-        self.curriculum = "\n".join(tmp)
+        self.curriculum = "\n".join(string)
         
         try:
             # get course name

@@ -15,16 +15,27 @@ string = string.split('\n')
 string.pop(1)
 
 previous = string[2]
+flag = False
 idx = 3
 for tmp in string[3:]:
 
     if tmp[12:] == previous[12:]:
-        print(tmp[7:11])
-        string[idx] = tmp.replace(tmp[7:11] ,previous[7:11])
+        if not flag:
+            time = previous[:5]
+            flag = True
+            
         string.pop(idx-1)
     else:
+        if flag:
+            string[idx-1] = previous.replace(previous[:5], time)
+            flag = False
+
         idx += 1
         
     previous = tmp
+
+if flag:
+    string[-1] = tmp.replace(tmp[:5], time)
+
 
 print("\n".join(string))
