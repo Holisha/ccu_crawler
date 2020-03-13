@@ -1,0 +1,190 @@
+OS Project 0
+Build Linux Kernel
+Advisor : Chien-Chung Ho 
+TA:Zong-ZheYang
+Shih-HaoChin
+What is “Kernel”
+Kernel[1]
+―The kernel is a fundamental part of a modern computer‘s 
+operating system
+―The kernel's primary function 
+―Manage the computer's hardware and resources
+―Allow other programs to run and use these resources
+―Resources managed by the kernel consist of 
+―Central Processing Unit (CPU)
+―Main memory
+― Input/Output(I/O) devices
+2
+Environment Setup (1)
+ In this course, you will be requested to do some 
+implementations on the Linux kernel.
+To avoid some unexpected troubles due to the various 
+hardware environment, we will use the virtual machine 
+to implement the following projects.
+You should prepare a computer which installs the linux
+operating system, so as to implement the following 
+projects
+3
+Environment Setup (2)
+Please download the following two programs, and both 
+of them are free for use
+VirtualBox6.0.12 platform packages[2]
+―Download link: https://www.virtualbox.org/wiki/Downloads
+Ubuntu 16.04.6 64bits LTS[3]
+―Download link(Desktop): https://www.ubuntu-tw.org/modules/tinyd0/
+―Make sure that your version is 64bits 
+ Install the Ubuntu 16.04.6 on the VitualBox
+4
+Building Linux Kernel(1)
+After the Linux installation, please login your Ubuntu 
+and open a terminal to start your first experiment of 
+building the Linux kernel
+5
+Building Linux Kernel(2)
+Building Linux Kernel(2)
+1)mkdirkernels
+2)
+cd kernels 
+3)wgethttps://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-
+4.4.4.tar.xz
+4)
+5)
+6)
+tar Jxvflinux-4.4.4.tar.xz
+cd linux-4.4.4
+Install build tools  sudoapt-get install fakerootkernel-package libncurses5 
+libncurses5-dev libc6-dev libssl-dev build-essential
+7)make mrproper
+6
+Building Linux Kernel(3)
+8)
+make menuconfig
+
+Select (use “y”) the following options, the others use default setting 
+
+
+
+Device Drivers -->Fusion MPT device support -->Fusion MPT ScsiHostdrivers for 
+SPI
+Device Drivers -->Generic Deriver Options --> Maintain a devtmpfsto mount at /dev
+Device Drivers -->Generic Deriver Options --> Automountdevtmpfsar/dev, after 
+the kernel mounted the rootfs
+
+General setup Local version -StudentID1-StudentID2(Do not use blank space)
+7
+Building Linux Kernel(5)
+Building Linux Kernel(2)
+9)
+make
+―
+You can use make –j # (# is the number of your physical cores) to create 
+multiple threads to speed up the kernel building)
+10)
+11)
+12)
+13)
+14)
+make modules 
+sudomake modules_install
+sudomake install
+sudoapt-get install vim-gtk
+sudovim /etc/default/grub
+―
+Add “#” to comment the following 2 lines
+
+
+#GRUB_HIDDEN_TIMEOUT=10
+#GRUB_HIDDEN_TIMEOUT_QUIET=true
+8
+Building Linux Kernel(6)
+15)
+sudoupdate-grub2
+16)
+sudoshutdown -r now
+⁎ Install tool : vboxadditions
+―
+Some people might have problems of failing on doing the "make menuconfig" due to 
+the small resolution of window size. Please install the virtualboxtool to enable change 
+the resolution of the window size.
+9
+Building Linux Kernel(7)
+17)Now, you can select the version 4.4.4 kernel in the GNU grub to boot your 
+Ubuntu.
+18)Then, you can use terminal and type “uname–a” to check the kernel version.
+10
+Project Requirements
+
+Build your own kernel image. Pack the corresponding files and upload them into 
+the FTP server : 140.123.105.185;user ID:OS2019 ; pass: 2019OS (50%)
+
+Bonus (30%)
+―
+―
+In the step of “make menuconfig”, you can enable/disable some functionalities as you 
+want. 
+Please try to minimize the size of your built kernel image and maintain its internet 
+functionalities as well.
+Write a project report (PDF format, within 2~4 pages) (40%)
+―What do you learn from this project
+―
+Is there any problem when you are implementing the project, state it
+―Which item is disabled by you in the bonus part, and what is its functionalities?   
+11
+Project Notification
+ In the following projects, you are requested to implement the 
+requirement by groups.
+ 2members a team
+Check your team number ## in the ecourse/ ecourse2
+12
+Submit Requirement
+
+
+
+Project deadline: 2019/10/0823:59
+Delayed submissions yield 5 point deduction per day
+The team project should 
+
+
+Contain your report (PDF format, within 2~4 pages) 
+Contain your built kernel image files, as follows
+ /boot/vmlinuz-4.4.4
+ /boot/config-4.4.4
+ /boot/System.map-4.4.4
+ /boot/initrd.image-4.4.4
+
+linux-image-4.4.4StudentID_10.00.Custom_amd64.deb
+Building Debianpackage : 
+https://hackmd.io/@ULxjDFy0QLKSAQnD5DMKtQ/BkJW9iwvB
+
+Be packed as one file named “OSPJ0_Team##.ZIP”
+
+DONOTCOPYTHEHOMEWORK
+13
+Contact TAs
+ If you have any problem about the projects or this course, you 
+can contact TAs by the following ways.
+Facebook: CCU OS2019 FallGroup.
+― https://www.facebook.com/groups/1319131934920970/
+―E-mail: Shih-HaoChin: ae8681239@gmail.com
+Zong-ZheYang : daankfust123@gmail.com
+14
+References
+[1] Wikipedia http://en.wikipedia.org/wiki/Kernel_(computing)
+[2] VirtualBoxhttps://www.virtualbox.org/
+[3] Ubuntu http://www.ubuntu.com/
+[4] sudowikipediahttp://en.wikipedia.org/wiki/Sudo
+[5] Kernel module http://en.wikipedia.org/wiki/Loadable_kernel_module
+[6] 鳥哥的Linux私房菜http://linux.vbird.org/linux_basic/0540kernel.php
+[7] GRUB2  https://help.ubuntu.com/community/Grub2
+15
+References
+[8] fakeroot:使用remote server, 需要使用有root 權限指令時可能無法取得, 因此使
+用pseudo root
+https://unix.stackexchange.com/questions/9714/what-is-the-need-for-fakeroot-command-in-linux
+[9] build-essential : 可以安裝編譯需要的套件
+https://www.virtualbox.org/
+[10] kernel-package : 同樣也是安裝編譯需要的套件
+https://packages.ubuntu.com/zh-tw/xenial/kernel-package
+[11] libncurses5, libncurses5-dev : unix圖形函式庫, 提供文字化圖形介面給如ssh
+連線使用
+
