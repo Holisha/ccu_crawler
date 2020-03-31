@@ -10,7 +10,7 @@
 
 ## 使用說明
 
-- 先啟用兩個 api 並將 OAUTH 憑證改為 "credentials.json"，並放到資料夾內
+- 先啟用兩個 api 並將 OAUTH 憑證改為 "credentials.json"，並放到對應的資料夾內
   - 權限調整請參考 google developers 內的說明頁面
   - [calendar api](https://developers.google.com/calendar/quickstart/python)
   - [gmail api](https://developers.google.com/gmail/api/quickstart/python)
@@ -37,11 +37,14 @@ argparse
 ### 重點改動
 
 - 讓 pdf 檔案日期能正常加到行事曆上
+- 新增 實作過程 detail.md
 
 ### TODO
 
 - 增加 selenium 相關的效能
 - 下載 pdf 檔案
+- 寄信功能可以附圖片等
+- 現在只能純文字
 
 ### main.py
 

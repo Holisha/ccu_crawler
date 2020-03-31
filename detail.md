@@ -40,22 +40,18 @@ selenium
 5. 用 selenium 把今日課表抓下來
     - 效能尚未改善
 
-:::info
 - 如果遇到需要**重複登入或跳轉**的頁面，可以改用 selenium 爬
-:::
 
 ### 模擬登入
 
 #### requests
 
-:::info
 - 有的網站會擋爬蟲，故 header 有些要自己寫
 	- 騙網站是以使用者登入
 	- 以 dictionary 儲存 header 跟 payload
 
 - 有些網站把登入頁面寫在別的地方，會以 hidden 的方式把網站包起來
 	- 有些還需要 token 來辨識使用找
-:::
 
 - 查看**登入頁面**的網址
 - 先把**登入頁面的網址**爬下來，並找辨識的 token
@@ -212,7 +208,7 @@ XPath Axes
 ### 正規表示法
 
 - 通常被稱為一個**模式(pattern)**，用來描述或符合一系列**有規則的字串**
-- 可以執行效率未必快速，但方便 programmer，且很多語言都有支援
+- 執行效率未必快速，但方便 programmer 處理字串，且很多語言都有支援
 	- ex: python, c#, Java, JavaScript, c++...
 		- C++ 11 才開始支援
 
@@ -243,8 +239,9 @@ EX:
 - `split(pattern, str, maxsplit=0, flag=0)`
 	- 功能同 strcat，不過可以用正規表達式
 	- maxsplit 為最多可分割次數
-- sub(pat, repl ,str , count=0, flag=0)
+- `sub(pat, repl ,str , count=0, flag=0)``
 	- 把 str 內的 pattern 替換為 repl
+
 ```python=
 pat = 'John'
 repl = 'Tom'
@@ -256,7 +253,7 @@ re.sub(pat, repl, text)
 
 #### 匹配對象
 
-- 匹配到後會儲存到 `group` 中
+- 匹配的結果會儲存到 `group` 中
 - 之後補
 
 ### 分析
@@ -278,7 +275,7 @@ re.sub(pat, repl, text)
 - `find_parent` / `find_parents`
 - `find_next_sibling` / `find_previous_sibling`
 
-- `select`
+- `select`: CSS selector
 	- `:nth-of-type(int num)`: 找第 num 個 
 	- 以空格為間隔
 	- `>`: 從左邊的標籤找符合右邊標籤的內容
@@ -289,13 +286,14 @@ re.sub(pat, repl, text)
 		- [官網](https://www.crummy.com/software/BeautifulSoup/bs4/doc/#css-selectors)
 	- `select_one`: 回傳第一個找到的
 
-- `insert`
-	- `insert_before()` / `insert_after()`
-- `decompose`
-- `wrap`
-- `unwrap`
-- `replace_with`
-- `prettify()`
+- 其他
+	- `insert`
+		- `insert_before()` / `insert_after()`
+	- `decompose`
+	- `wrap`
+	- `unwrap`
+	- `replace_with`
+	- `prettify()`
 
 ## PDF reader
 
@@ -345,7 +343,7 @@ resp = self.service.events().insert(calendarId=ID, body=event).execute()
 - ID 預設為當前使用者，沒有則會跳出登入頁面，選擇使用者
 - 確定輸入的格式符合需求後，將其分切，並存到 `dict` 中
 	- 開始時間為當日00:00
-- resp 沒用到，宣告以利之後使用
+- 沒用到 resp，但保留該變數以利之後使用
 
 ### show_event
 
