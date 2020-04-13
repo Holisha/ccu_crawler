@@ -8,6 +8,14 @@
 - 爬取公告與討論區內容
 - 新增新的投影片到指定路徑
 
+### Demo
+
+- 顯示課表與公告
+![](https://i.imgur.com/qOCGV45.png)
+
+- 將作業期限新增到行事曆
+![](https://i.imgur.com/C7EGao5.png)
+
 ## 使用說明
 
 - 先啟用兩個 api 並將 OAUTH 憑證改為 "credentials.json"，並放到對應的資料夾內
@@ -67,6 +75,8 @@ gunicorn==20.0.4
 - **可以放在 heroku 上面自動執行**
 - 把今日課表效能加強，並可以在 heroku 上面執行
   - 原本用 selenium，現在改成 requests
+- 把 detail.md 刪掉，改成用 hackmd
+	- 不需要兩邊改來改去
 
 ### crawler.py
 
