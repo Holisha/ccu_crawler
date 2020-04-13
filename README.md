@@ -2,6 +2,7 @@
 
 ## 目前功能
 
+- 平日 00:00 自動執行
 - 爬作業時間，並將結果導到 gmail 跟 google calendar
   - 可爬 pdf 內容 跟 一般連結
 - 爬今日課表
@@ -11,10 +12,16 @@
 ### Demo
 
 - 顯示課表與公告
+
 ![](https://i.imgur.com/qOCGV45.png)
 
 - 將作業期限新增到行事曆
+
 ![](https://i.imgur.com/C7EGao5.png)
+
+- 自動執行
+
+![](https://i.imgur.com/KWCdiH8.png)
 
 ## 使用說明
 
