@@ -10,6 +10,7 @@ from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from getpass import getpass
 from datetime import datetime
+from pytz import timezone
 from time import sleep
 import getPDF
 
@@ -42,7 +43,9 @@ class Crawler():
     }
 
     # CCU one login page
-    one_login_url = "https://cas.ccu.edu.tw/login?service=https%3A%2F%2Fportal.ccu.edu.tw%2Flogin_check_cas.php"
+    one_login_url = r"https://cas.ccu.edu.tw/login?service=https%3A%2F%2Fportal.ccu.edu.tw%2Flogin_check_cas.php"
+    old_login_url = r"https://portal.ccu.edu.tw/login_check.php"
+    one_url = r'https://portal.ccu.edu.tw/sso_index.php'
 
     def __init__(self, username, password, download=False):
         # print(f'username:{username}')
@@ -60,7 +63,8 @@ class Crawler():
             self.daily_curriculum(progress=progress)
 
         if self.download and processing:
-            print('test')
+            print('developing')
+            os._exit(0)
         elif self.download:
             for idx in range(self.course_data.shape[0]):
                 target_dir = os.path.join(path, self.course_data.iloc[idx, 0])
@@ -73,25 +77,34 @@ class Crawler():
                     timeout=timeout
                 )
 
-    def login(self, url, login_url=login_url):
+    def login(self, url, login_url=login_url, one=False):
         # login with post method
         # cookies will change when request another page
-        self.headers['Referer'] = login_url
         session_requests = requests.session()
-        self.request = session_requests.get(login_url)
+        
+        # one can't get login url
+        if one:
+            self.__payload.pop('logintoken')
 
-        tree = html.fromstring(self.request.text)
-        token = list(set(tree.xpath('//input[@name="'+ TOKEN +'"]/@value')))
-        if token:
-            self.__payload['logintoken'] = token
-        self.request = session_requests.post(login_url, data = self.__payload, headers = self.headers)
-        self.request = session_requests.get(url, headers= dict(Referer = url))
+        else:
+            self.headers['Referer'] = login_url
+            self.request = session_requests.get(login_url)
+            tree = html.fromstring(self.request.text)
+            token = list(set(tree.xpath('//input[@name="'+ TOKEN +'"]/@value')))
+            if token:
+                self.__payload['logintoken'] = token
+        
+        self.request = session_requests.post(login_url, data=self.__payload, headers=self.headers)
+        # print(f'post: {self.request.url}')
+        self.request = session_requests.get(url, headers=dict(Referer = login_url))
+        # print(f'get: {self.request.url}')
 
         self.test_connection(self.request)
 
-    # return DataFrame
     def get_progress(self):
-        self.soup = bs(self.request.text, 'lxml')
+        """
+        get the courses of this semester
+        """
         course_name = []
         course_href = []
         course_info = self.soup.find_all(href=re.compile(r'^.*/course/.*id=[89]\d{3}$'))
@@ -254,6 +267,7 @@ class Crawler():
         return date_list
 
     def test_connection(self, request):
+        # print(f'test: {request.url}\n')
         self.soup = bs(request.text, 'lxml')
 
         if request.status_code != requests.codes.ok:    # 200
@@ -269,15 +283,76 @@ class Crawler():
                 print('login fail')
                 os._exit(0)
 
+    def daily_curriculum(self, progress=False, old=True):
+
+        if progress:
+            self.get_progress()
+
+        # check is weekdays or weekends
+        today = datetime.now(tz=timezone('Asia/Taipei')).isoweekday()
+        if today > 5:
+            self.curriculum = 'Today is weekends'
+            return
+        
+        if old:
+        # old login format
+            self.__payload['acc'] = self.__payload['username']
+            self.__payload['pass'] = self.__payload['password']
+            self.login(self.one_url, self.old_login_url, old)
+
+
+        # get today's schedule
+        tmp_list = []
+        schedule = []
+        tmp = self.soup.select_one(f'div #w_DailyCourse #daily_course_content_{today} table')
+        # print(today)
+        # print(tmp)
+        for idx, string in enumerate(tmp.find_all('td'), 1):
+            tmp_list.append(string.string)
+
+            if idx % 3 == 0:
+                schedule.append(' '.join(tmp_list))
+                tmp_list = []
+        
+        # remove repeated course name
+        previous_string = schedule[0]
+        idx = 1
+        for string in schedule[1:]:
+            if previous_string[12:] == string[12:]:
+                schedule[idx] = string.replace(string[:6], previous_string[:6])
+
+                # pop repeated one
+                schedule.pop(idx - 1)
+            else:
+                idx += 1
+            
+            previous_string = string
+
+        # get daily curriculum schedule
+        self.curriculum = """今日課表\n"""
+        self.curriculum += '\n'.join(schedule)
+        
+         # get course name
+        self.curriculum += '\n\n----Announcement----\n\n'
+        today_course = []
+        for tmp in schedule:
+            today_course.append(
+                tmp.split(' ')[1]
+            )
+        # compare course
+        for idx, course_name in enumerate(self.course_data.iloc[:, 0]):
+            if course_name in today_course:
+                self.curriculum += self.get_ctopics(course_name, self.course_data.iloc[idx, 1])
+
     # craw by selenium, performance is not good as excepted
-    def daily_curriculum(self, progress=False):
+    def daily_curriculum_selenium(self, progress=False):
         # TODO: performance enhance
 
         if progress:
             self.get_progress()
 
         # check is weekdays or weekends
-        if datetime.today().weekday() >= 5:
+        if datetime.now(tz=timezone('Asia/Taipei')).weekday() >= 5:
             self.curriculum = 'Today is weekends'
             return
 
@@ -442,15 +517,18 @@ if __name__ == '__main__':
     # USERNAME = input('username:')
     USERNAME = '406410093'
     PASSWORD = getpass()
-    TEST_URL = ['https://ecourse2.ccu.edu.tw/course/view.php?id=6054']
+    # TEST_URL = ['https://ecourse2.ccu.edu.tw/course/view.php?id=6054']
     # TEST_URL.append('https://ecourse2.ccu.edu.tw/course/view.php?id=6068')  # OS
 
     course = Crawler(USERNAME, PASSWORD)
     course.login(URL)
 
-    # course.get_progress()
+    course.get_progress()
 
-    course.get_course(TEST_URL)
+    course.daily_curriculum()
+    print(course.curriculum)
+
+    # course.get_course(TEST_URL)
     # print(course.event)
     # course.print_course()
     # print(course.course_data)
