@@ -17,34 +17,68 @@
 
 - 需要的 package:
 ```python
-requests
-bs4
-lxml
-selenium
-pandas
-pdfminer3k
-google-api-client
-pickle
-argparse
+# locally
+beautifulsoup4==4.8.2
+decorator==4.4.2
+google-api-python-client==1.6.7
+google-auth==1.11.2
+google-auth-httplib2==0.0.3
+google-auth-oauthlib==0.4.1
+httplib2==0.17.0
+lxml==4.5.0
+oauth2client==4.1.2
+oauthlib==3.1.0
+pandas==1.0.1
+pdfminer3k==1.3.1
+pickleshare==0.7.5
+selenium==3.141.0
+virtualenv==20.0.4
+
+# heroku
+APScheduler==3.6.3
+dj-database-url==0.5.0
+dj-static==0.0.6
+gunicorn==20.0.4
 ```
+
 - 執行時加入 `-h` 或 `-help` 可以預覽現有功能
 - 第一次啟動時會詢問要以哪個帳號使用 api
   - 接著會將呼叫 api 所需的資訊存到 pickle 裡面
   - 如要更改帳號，刪除掉資料夾內的 `.pickle`
+
+## 實作細節
+
+- [crawler](https://hackmd.io/ISiaMVvvR7uwmNgQODKQrQ)
+
+### TODO
+
+- 單一入口改用新版登入介面進入
+  - 現在是用舊版
+  - 要處理 `g-recaptcha`
+- 增加 selenium 相關的效能
+- 下載 pdf 檔案
+- 寄信功能可以附圖片等
+  - 現在只能純文字
+
+## 1.0
+
+### 重點改動
+
+- **可以放在 heroku 上面自動執行**
+- 把今日課表效能加強，並可以在 heroku 上面執行
+  - 原本用 selenium，現在改成 requests
+
+### crawler.py
+
+- 新增 `one_url` 跟 `old_login_url` 來登入單一入口
+  - `__payload` 新增 `acc`, `pass` 當成帳號與密碼參數
+- `daily_curriculum` 改成用 requests 實作
 
 ## 0.9
 
 ### 重點改動
 
 - 讓 pdf 檔案日期能正常加到行事曆上
-- 新增 實作過程 detail.md
-
-### TODO
-
-- 增加 selenium 相關的效能
-- 下載 pdf 檔案
-- 寄信功能可以附圖片等
-- 現在只能純文字
 
 ### main.py
 
