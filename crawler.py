@@ -220,7 +220,7 @@ class Crawler():
             announcement.append('->' + ', '.join(tmp))
 
         if announcement:
-            self.announcement = title + '\n' + '\n'.join(announcement)
+            self.announcement = title + '\n' + '\n'.join(announcement) + '\n'
         else:
             self.announcement =''
             

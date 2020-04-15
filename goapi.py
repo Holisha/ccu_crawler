@@ -15,6 +15,8 @@ from datetime import datetime, date, timedelta
 
 
 class GoogleApi(): # calendar api only, v3 is current version
+    date_format = r'^\d{4}\D\d+\D\d+\D*\d+:\d{2}$'
+
     def __init__(self, api_name, api_version):
         self.location = api_name
 
@@ -50,21 +52,34 @@ class GoogleApi(): # calendar api only, v3 is current version
         # self.service = build(api_name, api_version, http=creds.authorize(Http()))
         self.service = build(api_name, api_version, credentials=creds)
 
-    def add_event(self, event_name, event_time, ID='primary', UTC='+08:00', notice='all', attendees=None, check=True, from_today=True):
+    def add_event(self, event_name, event_time, start_time=None ,ID='primary', UTC='+08:00', notice='all', attendees=None, check=True, from_today=True):
+        # TODO: add end time
+
         if self.location != 'calendar':
             print(f'error service! You\'re calling {self.location}')
             return
         
         self.UTC = UTC  # Taiwan is +08:00
 
+        if start_time is None:
+            start_time = event_time
 
-        # event time format: yyyy/mm/dd HH:MM
-        if not re.search(r'^\d{4}\D\d+\D\d+\D*\d+:\d{2}$', event_time):
+        # time format: yyyy/mm/dd HH:MM
+        if not re.search(self.date_format, event_time) or not re.search(self.date_format, start_time):
             print('time format error\nyyyy/mm/dd HH:MM')
             return
         
+        # change the time format of start time is start time is none
+        if start_time == event_time:
+            start_time = re.sub(r'\d{2}:\d{2}', r'00:00', start_time)
+        # check whether the start time is later than event time or not
+        elif start_time > event_time:
+            print('TimeError: start time is later than event time')
+            return
+
         # 0: year, 1: month, 2: day, 3: hour, 4: minute
         time_list = re.split(r'\D', event_time)
+        start_list = re.split(r'\D', start_time)
 
         # if deadline end in 00:00, modify the date and time of deadline to 23:59 and day - 1
         if re.match(r'0\d', time_list[3]):
@@ -78,12 +93,16 @@ class GoogleApi(): # calendar api only, v3 is current version
         event = {
             'summary': f'{event_name}',
             'start': {
-                'dateTime': f'{time_list[0]}-{time_list[1]}-{time_list[2]}T00:00:00{self.UTC}'
+                'dateTime': f'{start_list[0]}-{start_list[1]}-{start_list[2]}T{start_list[3]}:{start_list[4]}:00{self.UTC}'
             },
             'end': {
                 'dateTime': f'{time_list[0]}-{time_list[1]}-{time_list[2]}T{time_list[3]}:{time_list[4]}:00{self.UTC}'
             },
         }
+
+        print(event)
+        os._exit(0)
+
         # add
         if attendees:
             event['attendees'] = attendees
@@ -168,12 +187,16 @@ class GoogleApi(): # calendar api only, v3 is current version
             print (f'An error occurred: {errors}')
 
 if __name__ == '__main__':
+    attendee = [
+        {'email': 'fan89511@gmail.com'}
+    ]
     calendar = GoogleApi('calendar', 'v3')
     # print(sys.argv[1])
     # calendar.add_event('test', sys.argv[1])
-    calendar.add_event('time test 1', '2020-3-22 00:04')
-    calendar.add_event('time test 2', '2020-3-24 00:04') 
-    calendar.show_event()
+    # calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', attendees=attendee)
+    calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', '2020-4-27 11:50')
+    # calendar.add_event('time test 2', '2020-3-24 00:04') 
+    # calendar.show_event()
 
     """ mail = GoogleApi('gmail', 'v1')
     MAIL = 'fan89511@gmail.com'
