@@ -19,7 +19,7 @@ TOKEN = 'logintoken'
 LOGIN_URL = 'https://ecourse2.ccu.edu.tw/login/index.php'
 URL =  'https://ecourse2.ccu.edu.tw/my/'
 
-# TODO: pdf crawler
+# TODO: pdf crawler, add homework to daily curriculum
 class Crawler():
     event = {}      # store events
     __payload = {}  # store username, password, and session key
@@ -220,7 +220,7 @@ class Crawler():
             announcement.append('->' + ', '.join(tmp))
 
         if announcement:
-            self.announcement = title + '\n' + '\n'.join(announcement)
+            self.announcement = title + '\n' + '\n'.join(announcement) + '\n'
         else:
             self.announcement =''
             
