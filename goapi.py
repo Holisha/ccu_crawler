@@ -14,7 +14,23 @@ import sys
 from datetime import datetime, date, timedelta
 
 
-class GoogleApi(): # calendar api only, v3 is current version
+class GoogleApi():
+    r"""
+    call a class object to control goole api
+    processing version: <calendar, v3>, <gmail, v1>
+
+    calendar function has:
+        add_event: create a new calendar event in particular calendar (default is primary calendar)
+        show_event: show the 10 (or more) of upcoming events in particular calendar(defalut is primary calendar)
+        check_repetitive: Avoid to add same event in calendar (called in add_event)
+        date_adjust: make the 24:00 to 23:59 and day - 1
+    
+    gmail function:
+        mail_create: create an email which contain text only
+        mail_send: send created email(called in mail_create)
+    """
+    date_format = r'^\d{4}\D\d+\D\d+\D*\d+:\d{2}$'
+
     def __init__(self, api_name, api_version):
         self.location = api_name
 
@@ -50,25 +66,39 @@ class GoogleApi(): # calendar api only, v3 is current version
         # self.service = build(api_name, api_version, http=creds.authorize(Http()))
         self.service = build(api_name, api_version, credentials=creds)
 
-    def add_event(self, event_name, event_time, ID='primary', UTC='+08:00', notice='all', attendees=None, check=True, from_today=True):
+    def add_event(self, event_name, event_time, start_time=None ,ID='primary', UTC='+08:00', notice='all', attendees=None, check=True, from_today=True):
+        # TODO: add information
+
         if self.location != 'calendar':
-            print(f'error service! You\'re calling {self.location}')
+            print(f'ServiceError: You\'re calling {self.location}')
             return
         
         self.UTC = UTC  # Taiwan is +08:00
 
+        if start_time is None:
+            start_time = event_time
 
-        # event time format: yyyy/mm/dd HH:MM
-        if not re.search(r'^\d{4}\D\d+\D\d+\D*\d+:\d{2}$', event_time):
-            print('time format error\nyyyy/mm/dd HH:MM')
+        # time format: yyyy/mm/dd HH:MM
+        if not re.search(self.date_format, event_time) or not re.search(self.date_format, start_time):
+            print('FormatError: recommend format is yyyy/mm/dd HH:MM')
             return
         
+        # check whether the start time is later than event time or not
+        if start_time > event_time:
+            print('TimeError: start time is later than event time')
+            return
+
         # 0: year, 1: month, 2: day, 3: hour, 4: minute
         time_list = re.split(r'\D', event_time)
+        start_list = re.split(r'\D', start_time)
 
         # if deadline end in 00:00, modify the date and time of deadline to 23:59 and day - 1
         if re.match(r'0\d', time_list[3]):
             time_list = self.date_adjust(time_list)
+
+            # modify start time if is same day as event time
+            if start_time == event_time:
+                start_list = self.date_adjust(start_list, False)
 
         # check the time
         if from_today and event_time < str(datetime.today()):
@@ -78,19 +108,20 @@ class GoogleApi(): # calendar api only, v3 is current version
         event = {
             'summary': f'{event_name}',
             'start': {
-                'dateTime': f'{time_list[0]}-{time_list[1]}-{time_list[2]}T00:00:00{self.UTC}'
+                'dateTime': f'{start_list[0]}-{start_list[1]}-{start_list[2]}T{start_list[3]}:{start_list[4]}:00{self.UTC}'
             },
             'end': {
                 'dateTime': f'{time_list[0]}-{time_list[1]}-{time_list[2]}T{time_list[3]}:{time_list[4]}:00{self.UTC}'
             },
         }
+
         # add
         if attendees:
             event['attendees'] = attendees
 
         if check and self.check_repetitive(ID, event_name):
             return
-            
+        
 
         resp = self.service.events().insert(calendarId=ID,
                                             body=event, 
@@ -125,25 +156,29 @@ class GoogleApi(): # calendar api only, v3 is current version
             
         for event in event_list['items']:
             if event['summary'] == event_name:
-                print(f'{event_name} was already in the calendar')
+                print(f'EventExist: {event_name} was already in the calendar')
                 return True
 
         return False
 
     @staticmethod
-    def date_adjust(time_list):
-        # input is a list
+    def date_adjust(time_list, end=True):
+        # input is a list, end is return end of the day
         # 0: year, 1: month, 2: day, 3: hour, 4: minute
         deadline = date(int(time_list[0]), int(time_list[1]), int(time_list[2])) - timedelta(days=1)
         tmp = re.split('-' ,deadline.isoformat())
-        tmp.append('23')
-        tmp.append('59')
+        if end :
+            tmp.append('23')
+            tmp.append('59')
+        else:
+            tmp.append('00')
+            tmp.append('00')
 
         return tmp
 
     def mail_create(self, sender, to, subject, msg_text, send=True):
         if self.location != 'gmail':
-            print(f'error service! You\'re calling {self.location}')
+            print(f'ServiceError: You\'re calling {self.location}')
             return
 
         # message = MIMEText(msg_text)
@@ -168,12 +203,16 @@ class GoogleApi(): # calendar api only, v3 is current version
             print (f'An error occurred: {errors}')
 
 if __name__ == '__main__':
+    attendee = [
+        {'email': 'fan89511@gmail.com'}
+    ]
     calendar = GoogleApi('calendar', 'v3')
     # print(sys.argv[1])
     # calendar.add_event('test', sys.argv[1])
-    calendar.add_event('time test 1', '2020-3-22 00:04')
-    calendar.add_event('time test 2', '2020-3-24 00:04') 
-    calendar.show_event()
+    # calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', attendees=attendee)
+    calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', '2020-4-27 11:50')
+    # calendar.add_event('time test 2', '2020-3-24 00:04') 
+    # calendar.show_event()
 
     """ mail = GoogleApi('gmail', 'v1')
     MAIL = 'fan89511@gmail.com'
