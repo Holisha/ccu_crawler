@@ -98,7 +98,11 @@ class GoogleApi():
 
             # modify start time if is same day as event time
             if start_time == event_time:
-                start_list = self.date_adjust(start_list, False)
+                start_list = self.date_adjust(start_list, end=False)
+        # if start time = event time and which is at 23:59
+        elif start_time == event_time:
+            start_list[3] = '00'
+            start_list[4] = '00'
 
         # check the time
         if from_today and event_time < str(datetime.today()):
@@ -121,7 +125,6 @@ class GoogleApi():
 
         if check and self.check_repetitive(ID, event_name):
             return
-        
 
         resp = self.service.events().insert(calendarId=ID,
                                             body=event, 
@@ -167,7 +170,8 @@ class GoogleApi():
         # 0: year, 1: month, 2: day, 3: hour, 4: minute
         deadline = date(int(time_list[0]), int(time_list[1]), int(time_list[2])) - timedelta(days=1)
         tmp = re.split('-' ,deadline.isoformat())
-        if end :
+
+        if end:
             tmp.append('23')
             tmp.append('59')
         else:
@@ -210,7 +214,7 @@ if __name__ == '__main__':
     # print(sys.argv[1])
     # calendar.add_event('test', sys.argv[1])
     # calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', attendees=attendee)
-    calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', '2020-4-27 11:50')
+    calendar.add_event('編譯器設計-midterm', '2020-4-27 00:00')
     # calendar.add_event('time test 2', '2020-3-24 00:04') 
     # calendar.show_event()
 

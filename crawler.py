@@ -204,13 +204,14 @@ class Crawler():
 
         return self.event
 
-    def get_ctopics(self, title, url=None, soup=None):
+    def get_ctopics(self, title, url=None, soup=None, homework=True):
         # TODO: deal with announcement and forum
 
         if not soup and url:
             self.login(url, self.headers['Referer'])
             soup = bs(self.request.text, 'lxml')
         
+        # add announcement and forum
         announcement = []
         for announce in soup.select('div.format_topcoll_tooltip a[href]'):
             tmp= []
@@ -222,8 +223,21 @@ class Crawler():
         if announcement:
             self.announcement = title + '\n' + '\n'.join(announcement) + '\n'
         else:
-            self.announcement =''
+            self.announcement = ''
+        
+        if not homework:
+            return self.announcement
+        
+        # add homework info
+        self.announcement += '\n------Homework------\n\n'
+        for homework_title, deadline in self.event.items():
             
+            # if no homework then skip, add to the annoucement, otherwise
+            if deadline.endswith('No deadline currently'):
+                continue
+            elif title in homework_title and deadline >= str(datetime.today()):
+                self.announcement += homework_title + ': ' + deadline + '\n'
+
         return self.announcement
 
     # check wehter pdf file exist in keyword list section

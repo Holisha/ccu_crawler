@@ -1,12 +1,12 @@
 from __future__ import print_function
 from getpass import getpass
+from datetime import datetime
 import argparse
 import os
 
 from crawler import Crawler
 from goapi import GoogleApi
 from getPDF import PDF
-
 
 
 # USERNAME = input('username:')
@@ -44,6 +44,9 @@ def main():
     PASSWORD = getpass('password:')
 
     # os.path.join(os.getcwd(), 'course')
+
+    print(f'\n<start the crawler at {datetime.now()}>\n')
+
     course = Crawler(USERNAME, PASSWORD, args.download)
     course.setup(
                     URL,
@@ -81,10 +84,13 @@ def main():
         if deadline.endswith('No deadline currently'):
             # print('skipped')
             continue
+
         # event name, event time, attendees
         cal.add_event(title, deadline, attendees=attendee)
     
     # cal.show_event()
+
+    print(f'\n<end of crawler at {datetime.now()}>\n')
 
 if __name__ == '__main__':
     main()
