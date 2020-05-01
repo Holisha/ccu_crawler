@@ -70,10 +70,20 @@ gunicorn==20.0.4
 - 單一入口改用新版登入介面進入
   - 現在是用舊版
   - 要處理 `g-recaptcha`
-- 增加 selenium 相關的效能
-- 下載 pdf 檔案
+- 增加 selenium 相關的爬蟲效能
 - 寄信功能可以附圖片等
   - 現在只能純文字
+- 下載 pdf 檔案
+- 修正下載檔名有時會錯誤
+
+## 1.3
+
+### cralwer.py
+
+- 修正 `get_ctopics` 格式錯誤
+  - 移除 `homework` 參數
+  - 移除 homework information 的部分，並將其移至其他函式
+- 新增 `get_homework` 爬取今日作業項目
 
 ## 1.2
 

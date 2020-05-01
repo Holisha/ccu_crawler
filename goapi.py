@@ -213,8 +213,8 @@ if __name__ == '__main__':
     calendar = GoogleApi('calendar', 'v3')
     # print(sys.argv[1])
     # calendar.add_event('test', sys.argv[1])
-    # calendar.add_event('編譯器設計-midterm', '2020-4-27 11:40', attendees=attendee)
-    calendar.add_event('編譯器設計-midterm', '2020-4-27 00:00')
+    calendar.add_event('深度學習概論-midterm', '2020-05-01 16:00','2020-05-01 13:15', attendees=attendee)
+    # calendar.add_event('編譯器設計-midterm', '2020-4-27 00:00')
     # calendar.add_event('time test 2', '2020-3-24 00:04') 
     # calendar.show_event()
 

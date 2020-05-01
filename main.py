@@ -16,7 +16,6 @@ URL =  'https://ecourse2.ccu.edu.tw/my/'
 TEST_URL = []
 MAIL = 'fan89511@gmail.com'
 
-
 def main():
     parser = argparse.ArgumentParser(description='ecourse 2 crawler controller')
 

@@ -204,7 +204,7 @@ class Crawler():
 
         return self.event
 
-    def get_ctopics(self, title, url=None, soup=None, homework=True):
+    def get_ctopics(self, title, url=None, soup=None):
         # TODO: deal with announcement and forum
 
         if not soup and url:
@@ -225,20 +225,25 @@ class Crawler():
         else:
             self.announcement = ''
         
-        if not homework:
-            return self.announcement
-        
+        return self.announcement
+    
+    def get_homework(self, title, url=None, soup=None):
+
+        if not soup and url:
+            self.login(url, self.headers['Referer'])
+            soup = bs(self.request.text, 'lxml')
+
         # add homework info
-        self.announcement += '\n------Homework------\n\n'
+        homework = ''
         for homework_title, deadline in self.event.items():
             
             # if no homework then skip, add to the annoucement, otherwise
             if deadline.endswith('No deadline currently'):
                 continue
             elif title in homework_title and deadline >= str(datetime.today()):
-                self.announcement += homework_title + ': ' + deadline + '\n'
+                homework += homework_title + ':  ' + deadline + '\n'
 
-        return self.announcement
+        return homework
 
     # check wehter pdf file exist in keyword list section
     def check_pdf(self, soup):
@@ -347,16 +352,20 @@ class Crawler():
         self.curriculum += '\n'.join(schedule)
         
          # get course name
-        self.curriculum += '\n\n----Announcement----\n\n'
         today_course = []
         for tmp in schedule:
             today_course.append(
                 tmp.split(' ')[1]
             )
+
         # compare course
+        tmp_curriculum, tmp_homework = '\n\n----Announcement----\n\n', '\n------Homework------\n\n'
         for idx, course_name in enumerate(self.course_data.iloc[:, 0]):
             if course_name in today_course:
-                self.curriculum += self.get_ctopics(course_name, self.course_data.iloc[idx, 1])
+                tmp_curriculum += self.get_ctopics(course_name, self.course_data.iloc[idx, 1])
+                tmp_homework += self.get_homework(course_name, self.course_data.iloc[idx, 1])
+
+        self.curriculum += tmp_curriculum + tmp_homework
 
     # craw by selenium, performance is not good as excepted
     def daily_curriculum_selenium(self, progress=False):
