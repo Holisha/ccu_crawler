@@ -8,6 +8,7 @@ from crawler import Crawler
 from goapi import GoogleApi
 from getPDF import PDF
 
+# TODO: resubmit homework will deal to exist events added once again
 
 # USERNAME = input('username:')
 TOKEN = 'logintoken'

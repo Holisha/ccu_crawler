@@ -351,7 +351,7 @@ class Crawler():
         self.curriculum = """今日課表\n"""
         self.curriculum += '\n'.join(schedule)
         
-         # get course name
+        # get course name
         today_course = []
         for tmp in schedule:
             today_course.append(
