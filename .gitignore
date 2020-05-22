@@ -2,3 +2,4 @@
 *.pickle
 test.*
 *.txt
+!requirements.txt
