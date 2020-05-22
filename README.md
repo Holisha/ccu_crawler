@@ -24,6 +24,10 @@
 
 ![](https://i.imgur.com/KWCdiH8.png)
 
+- GUI
+
+![](https://i.imgur.com/UGhDEkZ.png)
+
 ## 使用說明
 
 - 先啟用兩個 api 並將 OAUTH 憑證改為 "credentials.json"，並放到對應的資料夾內
