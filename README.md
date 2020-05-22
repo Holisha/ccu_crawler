@@ -2,10 +2,11 @@
 
 ## 目前功能
 
-- 平日 00:00 自動執行
+- 每日 00:00 自動執行
 - 爬作業時間，並將結果導到 gmail 跟 google calendar
   - 可爬 pdf 內容 跟 一般連結
 - 爬今日課表
+  - 限平日
 - 爬取公告與討論區內容
 - 新增新的投影片到指定路徑
 
@@ -22,6 +23,10 @@
 - 自動執行
 
 ![](https://i.imgur.com/KWCdiH8.png)
+
+- GUI
+
+![](https://i.imgur.com/UGhDEkZ.png)
 
 ## 使用說明
 
@@ -49,6 +54,14 @@ pickleshare==0.7.5
 selenium==3.141.0
 virtualenv==20.0.4
 
+# gui
+PyQt5==5.12.3
+PyQt5-sip==4.19.18
+PyQtWebEngine==5.12.1
+qtconsole==4.7.1
+QtPy==1.9.0
+PySide2==5.14.2.1
+
 # heroku
 APScheduler==3.6.3
 dj-database-url==0.5.0
@@ -61,6 +74,20 @@ gunicorn==20.0.4
   - 接著會將呼叫 api 所需的資訊存到 pickle 裡面
   - 如要更改帳號，刪除掉資料夾內的 `.pickle`
 
+### 部署到 heroku
+
+- 創建帳號與 app 過程不贅述
+  - 詳情參考[實作細節](#實作細節)
+
+- 需要將 `.pickle` 一併上傳到 heroku
+- 啟動前需設置環境變數 `USERNAME` 和 `PASSWORD`
+  - `heroku config:set USERNAME=your_username`
+  - `heroku config:set PASSWORD=your_password`
+
+- 使用 `heroku ps:scale=1 crawler` 啟動
+
+- [詳細教學](https://djangogirlstaipei.herokuapp.com/tutorials/deploy-to-heroku/?os=windows)
+
 ## 實作細節
 
 - [crawler](https://hackmd.io/ISiaMVvvR7uwmNgQODKQrQ)
@@ -69,11 +96,32 @@ gunicorn==20.0.4
 
 - 單一入口改用新版登入介面進入
   - 現在是用舊版
-  - 要處理 `g-recaptcha`
-- 增加 selenium 相關的效能
-- 下載 pdf 檔案
+  - 要處理 `g-recaptcha` 驗證問題
+- 增加 selenium 相關的爬蟲效能
 - 寄信功能可以附圖片等
   - 現在只能純文字
+- 下載 pdf 檔案
+- 修正下載檔名有時會錯誤
+- 將爬蟲資料存進本地，以方便建構 gui 
+- gui 讓課程列表、attendees 全部變成參數
+  - 根據使用者課表，客制化自己的課表
+
+## 2.0
+
+### gui.py
+
+- 新增 gui 介面
+- 與 google calendar api 連結
+- 目前都是能夠使用的內容為寫死的，故仍需再改
+
+## 1.3
+
+### cralwer.py
+
+- 修正 `get_ctopics` 格式錯誤
+  - 移除 `homework` 參數
+  - 移除 homework information 的部分，並將其移至其他函式
+- 新增 `get_homework` 爬取今日作業項目
 
 ## 1.2
 
